@@ -1,0 +1,17 @@
+# Datos descargados (no commitear los ficheros grandes de la PLACSP)
+data/
+*.zip
+*.atom
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Secretos — por si acaso, nunca commitear
+.env
+
+# Sistema
+.DS_Store
+Thumbs.db

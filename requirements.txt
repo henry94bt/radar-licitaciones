@@ -1,0 +1,10 @@
+# Núcleo del pipeline
+requests>=2.31          # descarga del fichero de la PLACSP
+lxml>=5.0               # parseo XML/ATOM/CODICE (más rápido y tolerante que etree)
+pandas>=2.0             # filtrado y manejo tabular
+
+# Resúmenes con LLM
+anthropic>=0.40         # cliente oficial de la API de Anthropic
+
+# (opcional) si al final quieres plantillas de HTML más cómodas
+# jinja2>=3.1
