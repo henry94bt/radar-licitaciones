@@ -43,6 +43,13 @@
   .op__days{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:22px;line-height:1;}
   .op__deadline{font-size:11px;opacity:.9;}
   .op__body{padding:20px 22px;}
+  .op__semaforo{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:11px;
+    font-weight:600;letter-spacing:.04em;padding:3px 9px;border-radius:20px;margin:0 0 10px;
+    cursor:default;}
+  .op__semaforo--verde{background:#e3f3ec;color:#1f6b50;}
+  .op__semaforo--naranja{background:#fbeed9;color:#95611a;}
+  .op__semaforo--rojo{background:#fbe2dc;color:#a6402a;}
+  .op__motivos{font-size:12.5px;color:var(--ink-soft);margin:-8px 0 14px;font-style:italic;}
   .op__title{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;
     font-size:19px;line-height:1.22;margin:0 0 6px;letter-spacing:-.01em;}
   .op__org{font-size:13px;color:var(--ink-soft);margin:0 0 12px;}
@@ -74,282 +81,36 @@
     <select id="isla">
       <option value="">Todas las islas</option>
     </select>
+    <select id="semaforo">
+      <option value="">Todas las prioridades</option>
+      <option value="verde">🟢 Prioridad</option>
+      <option value="naranja">🟠 Valorar</option>
+      <option value="rojo">🔴 Descartar</option>
+    </select>
     <select id="orden">
       <option value="plazo">Vence antes</option>
       <option value="importe">Mayor importe</option>
     </select>
   </div>
-  <p class="count"><strong id="visibles">17</strong> de 17 oportunidades · Actualizado 21 jun 2026</p>
+  <p class="count"><strong id="visibles">1</strong> de 1 oportunidades · Actualizado 3 jul 2026</p>
   <main class="ops" id="ops">
 
-      <article class="op" data-isla="Tenerife" data-dias="6" data-importe="304494.68" data-texto="el objeto del contrato será la prestación de los servicios de mediación cultural, comunicación y la conservación, documentación y registro de la entidad pública tea tenerife espacio de las artes. vicepresidencia de tea tenerife espacio de las artes solicitan servicios de mediación cultural, comunicación y documentación para tea tenerife espacio de las artes. es un trabajo perfectamente alineado con las competencias de una agencia de marketing y comunicación: gestión de comunicación institucional, estrategia cultural y documentación de contenidos.">
-        <div class="op__clock op__clock--media">
-          <span class="op__days">6 días</span>
-          <span class="op__deadline">27 jun 2026</span>
-        </div>
-        <div class="op__body">
-          <h2 class="op__title">El objeto del contrato será la prestación de los servicios de mediación cultural, comunicación y la conservación, documentación y registro de la entidad pública TEA Tenerife Espacio de las Artes.</h2>
-          <p class="op__org">Vicepresidencia de Tea Tenerife Espacio de las Artes · Tenerife</p>
-          <p class="op__summary">Solicitan servicios de mediación cultural, comunicación y documentación para TEA Tenerife Espacio de las Artes. Es un trabajo perfectamente alineado con las competencias de una agencia de marketing y comunicación: gestión de comunicación institucional, estrategia cultural y documentación de contenidos.</p>
-          <div class="op__meta">
-            <span class="op__amount">304.494,68 €</span>
-            <a class="op__link" href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=c46RpisVE6SAAM7L03kM8A%3D%3D" target="_blank" rel="noopener">Ver pliego →</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="op" data-isla="Lanzarote" data-dias="15" data-importe="400147.9" data-texto="servicios de iluminación y sonido, audiovisuales e infraestructuras de la 37 feria insular de artesanía de lanzarote (3 lotes) consejería del área de hacienda y contratación del cabildo insular de lanzarote solicitan servicios de iluminación, sonido, audiovisuales e infraestructuras para la 37 feria insular de artesanía de lanzarote. es un trabajo relevante para la agencia porque engloba producción audiovisual, dirección técnica de eventos y gestión integral de infraestructuras comunicacionales en ferias, campos en los que una agencia de marketing y comunicación tiene clara capacidad de ejecución.">
-        <div class="op__clock op__clock--media">
-          <span class="op__days">15 días</span>
+      <article class="op" data-isla="Gran Canaria" data-dias="3" data-importe="220185.95" data-semaforo="naranja" data-texto="servicio de organización, producción, desarrollo de las actividades conmemorativas del tercer centenario de contribución de canarias
+a la fundación de montevideo, república de uruguay viceconsejería de cultura y patrimonio cultural del gobierno de canarias solicitan organización y producción de acto conmemorativo del tercer centenario de canarias-montevideo en gran canaria. encaja con capacidades de producción audiovisual y estrategia de contenido, pero el objeto es más coordinación de evento institucional que servicios de marketing core; valorar viabilidad según disponibilidad de equipo para evento presencial.">
+        <div class="op__clock op__clock--urgente">
+          <span class="op__days">3 días</span>
           <span class="op__deadline">6 jul 2026</span>
         </div>
         <div class="op__body">
-          <h2 class="op__title">Servicios de iluminación y sonido, audiovisuales e infraestructuras de la 37 Feria Insular de Artesanía de Lanzarote (3 lotes)</h2>
-          <p class="op__org">Consejería del Área de Hacienda y Contratación del Cabildo Insular de Lanzarote · Lanzarote</p>
-          <p class="op__summary">Solicitan servicios de iluminación, sonido, audiovisuales e infraestructuras para la 37 Feria Insular de Artesanía de Lanzarote. Es un trabajo relevante para la agencia porque engloba producción audiovisual, dirección técnica de eventos y gestión integral de infraestructuras comunicacionales en ferias, campos en los que una agencia de marketing y comunicación tiene clara capacidad de ejecución.</p>
+          <div class="op__semaforo op__semaforo--naranja" title="Evento conmemorativo en Gran Canaria con producción y desarrollo, encaja parcialmente con servicios core (producción audiovisual, estrategia de contenido). · CPV 79950000 (otros servicios) sugiere componentes secundarios como organización/coordinación que no son core de agencia de marketing. · Importe suficiente (220k EUR) pero naturaleza del proyecto es más institucional/patrimonial que marketing comercial.">🟠 Valorar</div>
+          <h2 class="op__title">Servicio de organización, producción, desarrollo de las actividades conmemorativas del Tercer Centenario de Contribución de Canarias
+a la fundación de Montevideo, República de Uruguay</h2>
+          <p class="op__org">Viceconsejería de Cultura y Patrimonio Cultural del Gobierno de Canarias · Gran Canaria</p>
+          <p class="op__summary">Solicitan organización y producción de acto conmemorativo del Tercer Centenario de Canarias-Montevideo en Gran Canaria. Encaja con capacidades de producción audiovisual y estrategia de contenido, pero el objeto es más coordinación de evento institucional que servicios de marketing core; valorar viabilidad según disponibilidad de equipo para evento presencial.</p>
+          <p class="op__motivos">Evento conmemorativo en Gran Canaria con producción y desarrollo, encaja parcialmente con servicios core (producción audiovisual, estrategia de contenido). · CPV 79950000 (otros servicios) sugiere componentes secundarios como organización/coordinación que no son core de agencia de marketing. · Importe suficiente (220k EUR) pero naturaleza del proyecto es más institucional/patrimonial que marketing comercial.</p>
           <div class="op__meta">
-            <span class="op__amount">400.147,90 €</span>
-            <a class="op__link" href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=OIeJg9uFQYFeKgd8LfVV9g%3D%3D" target="_blank" rel="noopener">Ver pliego →</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="op" data-isla="Canarias" data-dias="23" data-importe="963000.0" data-texto="servicios de gestiòn con medios y soportes publicitarios consejero delegado de la sociedad canaria de fomento económico s.a. - proexca solicitan servicios de gestión con medios y soportes publicitarios para promocionar iniciativas económicas en canarias. es un trabajo directo de una agencia de marketing: planificación de campañas, compra de medios, diseño de soportes publicitarios y estrategia de comunicación comercial.">
-        <div class="op__clock op__clock--holgado">
-          <span class="op__days">23 días</span>
-          <span class="op__deadline">14 jul 2026</span>
-        </div>
-        <div class="op__body">
-          <h2 class="op__title">Servicios de gestiòn con medios y soportes publicitarios</h2>
-          <p class="op__org">Consejero Delegado de la Sociedad Canaria de Fomento Económico S.A. - PROEXCA · Canarias</p>
-          <p class="op__summary">Solicitan servicios de gestión con medios y soportes publicitarios para promocionar iniciativas económicas en Canarias. Es un trabajo directo de una agencia de marketing: planificación de campañas, compra de medios, diseño de soportes publicitarios y estrategia de comunicación comercial.</p>
-          <div class="op__meta">
-            <span class="op__amount">963.000,00 €</span>
-            <a class="op__link" href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=fKnjAQ8yIgjmnwcj%2BxbdTg%3D%3D" target="_blank" rel="noopener">Ver pliego →</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="op" data-isla="Tenerife" data-dias="1" data-importe="1016500.0" data-texto="contratación del patrocinio para la promoción nacional e internacional de “tenerife despierta emociones!” como destino turístico a través de la federación española de baloncesto durante 2026. consejo de administración de spet, turismo de tenerife, s.a. solicitan patrocinio para promoción nacional e internacional de tenerife como destino turístico mediante asociación con la federación española de baloncesto durante 2026. es perfectamente ejecutable por una agencia de marketing y comunicación: implica estrategia de branding turístico, campaña de posicionamiento, gestión de alianzas deportivas y promoción multicanal a nivel nacional e internacional.">
-        <div class="op__clock op__clock--urgente">
-          <span class="op__days">1 días</span>
-          <span class="op__deadline">22 jun 2026</span>
-        </div>
-        <div class="op__body">
-          <h2 class="op__title">Contratación del Patrocinio para la promoción nacional e internacional de “Tenerife Despierta Emociones!” como destino turístico a través de la federación española de baloncesto durante 2026.</h2>
-          <p class="op__org">Consejo de Administración de Spet, Turismo de Tenerife, S.A. · Tenerife</p>
-          <p class="op__summary">Solicitan patrocinio para promoción nacional e internacional de Tenerife como destino turístico mediante asociación con la federación española de baloncesto durante 2026. Es perfectamente ejecutable por una agencia de marketing y comunicación: implica estrategia de branding turístico, campaña de posicionamiento, gestión de alianzas deportivas y promoción multicanal a nivel nacional e internacional.</p>
-          <div class="op__meta">
-            <span class="op__amount">1.016.500,00 €</span>
-            <a class="op__link" href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=7%2F%2BoV8lMB21VkTabT%2FRM8A%3D%3D" target="_blank" rel="noopener">Ver pliego →</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="op" data-isla="Gran Canaria" data-dias="1" data-importe="235400.0" data-texto="contratación del servicio de producción y servicios generales de las fiestas del carmen 2026 de las palmas de gran canaria, organizado por la sociedad promoción de la ciudad de las palmas de gran canaria, s.a. consejo de administración de promoción de la ciudad de las palmas de gran canaria s.a. solicitan la producción y servicios generales para las fiestas del carmen 2026 en las palmas, incluyendo coordinación, logística y organización del evento. es relevante porque una agencia de marketing puede ejecutar la producción audiovisual, coordinación de eventos, gestión de comunicación y branding del festival.">
-        <div class="op__clock op__clock--urgente">
-          <span class="op__days">1 días</span>
-          <span class="op__deadline">22 jun 2026</span>
-        </div>
-        <div class="op__body">
-          <h2 class="op__title">Contratación del servicio de producción y servicios generales de las Fiestas del Carmen 2026 de Las Palmas de Gran Canaria, organizado por la Sociedad Promoción de la Ciudad de Las Palmas de Gran Canaria, S.A.</h2>
-          <p class="op__org">Consejo de Administración de Promoción de la Ciudad de Las Palmas de Gran Canaria S.A. · Gran Canaria</p>
-          <p class="op__summary">Solicitan la producción y servicios generales para las Fiestas del Carmen 2026 en Las Palmas, incluyendo coordinación, logística y organización del evento. Es relevante porque una agencia de marketing puede ejecutar la producción audiovisual, coordinación de eventos, gestión de comunicación y branding del festival.</p>
-          <div class="op__meta">
-            <span class="op__amount">235.400,00 €</span>
-            <a class="op__link" href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=M4YLcdhfzwE3vLk2DU2Ddg%3D%3D" target="_blank" rel="noopener">Ver pliego →</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="op" data-isla="Gran Canaria" data-dias="1" data-importe="51500.17" data-texto="contrato de servicios consistentes en la realización de la “feria agroalimentaria de productos de proximidad” en la plaza de la candelaria, tm de ingenio presidencia de la mancomunidad intermunicipal del sureste de gran canaria solicitan la realización completa de una feria agroalimentaria incluyendo organización, producción audiovisual, branding y comunicación del evento. es un trabajo integral de gestión y promoción de evento que encaja perfectamente con los servicios de una agencia de marketing, diseño, redes sociales y producción audiovisual en canarias.">
-        <div class="op__clock op__clock--urgente">
-          <span class="op__days">1 días</span>
-          <span class="op__deadline">22 jun 2026</span>
-        </div>
-        <div class="op__body">
-          <h2 class="op__title">Contrato de servicios consistentes en la realización de la “Feria Agroalimentaria de Productos de Proximidad” en la Plaza de la Candelaria, TM de Ingenio</h2>
-          <p class="op__org">Presidencia de la Mancomunidad Intermunicipal del Sureste de Gran Canaria · Gran Canaria</p>
-          <p class="op__summary">Solicitan la realización completa de una Feria Agroalimentaria incluyendo organización, producción audiovisual, branding y comunicación del evento. Es un trabajo integral de gestión y promoción de evento que encaja perfectamente con los servicios de una agencia de marketing, diseño, redes sociales y producción audiovisual en Canarias.</p>
-          <div class="op__meta">
-            <span class="op__amount">51.500,17 €</span>
-            <a class="op__link" href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=1i8M%2FtjVScWS81gZFETWmA%3D%3D" target="_blank" rel="noopener">Ver pliego →</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="op" data-isla="Gran Canaria" data-dias="4" data-importe="68826.32" data-texto="servicio de coordinación, supervisión y gestión de eventos, y difusión en redes sociales y en la web por profesional especializado para los centros adscritos al instituto insular para la gestión integrada del patrimonio mundial y la reserva de la biosfera de gran canaria, isla de gran canaria. empresa de transformación agraria s.a.,s.m.e., m.p., (tragsa) solicitan coordinación y supervisión de eventos, junto con gestión de difusión en redes sociales y web para centros patrimoniales en gran canaria. es un trabajo de marketing, comunicación digital y organización de eventos que se ajusta perfectamente a los servicios de branding, redes sociales, campañas y eventos que ofrece la agencia.">
-        <div class="op__clock op__clock--urgente">
-          <span class="op__days">4 días</span>
-          <span class="op__deadline">25 jun 2026</span>
-        </div>
-        <div class="op__body">
-          <h2 class="op__title">Servicio de coordinación, supervisión y gestión de eventos, y difusión en redes sociales y en la web por profesional especializado para los centros adscritos al Instituto Insular para la Gestión Integrada del Patrimonio Mundial y la Reserva de la Biosfera de Gran Canaria, isla de Gran Canaria.</h2>
-          <p class="op__org">Empresa de Transformación Agraria S.A.,S.M.E., M.P., (TRAGSA) · Gran Canaria</p>
-          <p class="op__summary">Solicitan coordinación y supervisión de eventos, junto con gestión de difusión en redes sociales y web para centros patrimoniales en Gran Canaria. Es un trabajo de marketing, comunicación digital y organización de eventos que se ajusta perfectamente a los servicios de branding, redes sociales, campañas y eventos que ofrece la agencia.</p>
-          <div class="op__meta">
-            <span class="op__amount">68.826,32 €</span>
-            <a class="op__link" href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=%2B7nTZXkvAIQ3vLk2DU2Ddg%3D%3D" target="_blank" rel="noopener">Ver pliego →</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="op" data-isla="Canarias" data-dias="24" data-importe="502900.0" data-texto="planificación y ejecución de campañas y acciones publicitarias en medios pagados presidencia del consejo de administración de la institución ferial de tenerife s.a. solicitan planificación y ejecución de campañas publicitarias en medios pagados para una institución ferial. es un trabajo directo de marketing y publicidad que una agencia de comunicación canaria está completamente capacitada para ejecutar.">
-        <div class="op__clock op__clock--holgado">
-          <span class="op__days">24 días</span>
-          <span class="op__deadline">15 jul 2026</span>
-        </div>
-        <div class="op__body">
-          <h2 class="op__title">Planificación y ejecución de campañas y acciones publicitarias en medios pagados</h2>
-          <p class="op__org">Presidencia del Consejo de Administración de la Institución Ferial de Tenerife S.A. · Canarias</p>
-          <p class="op__summary">Solicitan planificación y ejecución de campañas publicitarias en medios pagados para una institución ferial. Es un trabajo directo de marketing y publicidad que una agencia de comunicación canaria está completamente capacitada para ejecutar.</p>
-          <div class="op__meta">
-            <span class="op__amount">502.900,00 €</span>
-            <a class="op__link" href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=j6KBhYN%2Blet%2FR5QFTlaM4A%3D%3D" target="_blank" rel="noopener">Ver pliego →</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="op" data-isla="Canarias" data-dias="3" data-importe="9000.0" data-texto="contratación del servicio de apoyo a la producción audiovisual, para el organismo autónomo patronato de medios de comunicación, dependiente del iltre. ayto de la villa de ingenio. presidencia del patronato municipal de medios de comunicación buscan contratar apoyo a la producción audiovisual para el patronato de medios de comunicación del ayuntamiento de ingenio. es un servicio de audiovisual que una agencia de marketing y comunicación con experiencia en producciones audiovisuales puede ejecutar perfectamente.">
-        <div class="op__clock op__clock--urgente">
-          <span class="op__days">3 días</span>
-          <span class="op__deadline">24 jun 2026</span>
-        </div>
-        <div class="op__body">
-          <h2 class="op__title">Contratación del servicio de apoyo a la producción audiovisual, para el organismo autónomo Patronato de Medios de Comunicación, dependiente del Iltre. Ayto de la Villa de Ingenio.</h2>
-          <p class="op__org">Presidencia del Patronato Municipal de Medios de Comunicación · Canarias</p>
-          <p class="op__summary">Buscan contratar apoyo a la producción audiovisual para el Patronato de Medios de Comunicación del Ayuntamiento de Ingenio. Es un servicio de audiovisual que una agencia de marketing y comunicación con experiencia en producciones audiovisuales puede ejecutar perfectamente.</p>
-          <div class="op__meta">
-            <span class="op__amount">9.000,00 €</span>
-            <a class="op__link" href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=kQNhjBV5kuOOUi78BmzhOQ%3D%3D" target="_blank" rel="noopener">Ver pliego →</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="op" data-isla="Canarias" data-dias="9" data-importe="246100.0" data-texto="servicio integral de conceptualización, dirección de contenidos y comunicación-festival enogastronómico saborea lanzarote. entidad pública empresarial local centros de arte, cultura y turismo de lanzarote buscan conceptualización, dirección de contenidos y comunicación integral para un festival enogastronómico en lanzarote. es un trabajo de branding, estrategia de comunicación y gestión de contenidos que una agencia de marketing y comunicación puede ejecutar completamente.">
-        <div class="op__clock op__clock--media">
-          <span class="op__days">9 días</span>
-          <span class="op__deadline">30 jun 2026</span>
-        </div>
-        <div class="op__body">
-          <h2 class="op__title">Servicio integral de conceptualización, dirección de contenidos y comunicación-festival enogastronómico Saborea Lanzarote.</h2>
-          <p class="op__org">Entidad Pública Empresarial Local Centros de Arte, Cultura y Turismo de Lanzarote · Canarias</p>
-          <p class="op__summary">Buscan conceptualización, dirección de contenidos y comunicación integral para un festival enogastronómico en Lanzarote. Es un trabajo de branding, estrategia de comunicación y gestión de contenidos que una agencia de marketing y comunicación puede ejecutar completamente.</p>
-          <div class="op__meta">
-            <span class="op__amount">246.100,00 €</span>
-            <a class="op__link" href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=zxgvOOqAQzbi0Kd8%2Brcp6w%3D%3D" target="_blank" rel="noopener">Ver pliego →</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="op" data-isla="" data-dias="4" data-importe="48150.0" data-texto="prestación de un servicio de fotografía y reportaje audiovisual para la cobertura informativa y multimedia de los actos institucionales y eventos académicos de la universidad de la laguna. rectorado de la universidad de la laguna solicitan cobertura fotográfica y audiovisual de actos institucionales y eventos académicos de la universidad de la laguna. es un trabajo de contenido multimedia y reportaje que encaja perfectamente con los servicios de audiovisual y comunicación de una agencia de marketing y diseño.">
-        <div class="op__clock op__clock--urgente">
-          <span class="op__days">4 días</span>
-          <span class="op__deadline">25 jun 2026</span>
-        </div>
-        <div class="op__body">
-          <h2 class="op__title">Prestación de un servicio de fotografía y reportaje audiovisual para la cobertura informativa y multimedia de los actos institucionales y eventos académicos de la Universidad de La Laguna.</h2>
-          <p class="op__org">Rectorado de la Universidad de La Laguna</p>
-          <p class="op__summary">Solicitan cobertura fotográfica y audiovisual de actos institucionales y eventos académicos de la Universidad de La Laguna. Es un trabajo de contenido multimedia y reportaje que encaja perfectamente con los servicios de audiovisual y comunicación de una agencia de marketing y diseño.</p>
-          <div class="op__meta">
-            <span class="op__amount">48.150,00 €</span>
-            <a class="op__link" href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=z3Q9qU4jmmaLAncw3qdZkA%3D%3D" target="_blank" rel="noopener">Ver pliego →</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="op" data-isla="Fuerteventura" data-dias="5" data-importe="77314.21" data-texto="servicio de gestión de redes sociales para la concejalía de turismo del ayuntamiento de de puerto del rosario concejalía delegada de contratación del ayuntamiento de puerto del rosario solicitan un servicio de gestión de redes sociales para la concejalía de turismo municipal. es un trabajo completamente alineado con las competencias de una agencia de marketing y comunicación, específicamente en la gestión de redes sociales y estrategia digital.">
-        <div class="op__clock op__clock--urgente">
-          <span class="op__days">5 días</span>
-          <span class="op__deadline">26 jun 2026</span>
-        </div>
-        <div class="op__body">
-          <h2 class="op__title">Servicio de gestión de redes sociales para la concejalía de turismo del Ayuntamiento de de Puerto del Rosario</h2>
-          <p class="op__org">Concejalía Delegada de Contratación del Ayuntamiento de Puerto del Rosario · Fuerteventura</p>
-          <p class="op__summary">Solicitan un servicio de gestión de redes sociales para la concejalía de turismo municipal. Es un trabajo completamente alineado con las competencias de una agencia de marketing y comunicación, específicamente en la gestión de redes sociales y estrategia digital.</p>
-          <div class="op__meta">
-            <span class="op__amount">77.314,21 €</span>
-            <a class="op__link" href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=I9j4gJHqBQt9Zh%2FyRJgM8w%3D%3D" target="_blank" rel="noopener">Ver pliego →</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="op" data-isla="Tenerife" data-dias="1" data-importe="80000.0" data-texto="servicio de compra y gestión de espacios en medios de comunicación y otros soportes publicitarios. junta directiva de la asociación de municipios turísticos de canarias solicitan un servicio de compra y gestión de espacios publicitarios en medios de comunicación y otros soportes. es un trabajo clave de una agencia de marketing: planificación de medios, negociación de espacios y gestión de campañas publicitarias.">
-        <div class="op__clock op__clock--urgente">
-          <span class="op__days">1 días</span>
-          <span class="op__deadline">22 jun 2026</span>
-        </div>
-        <div class="op__body">
-          <h2 class="op__title">Servicio de compra y gestión de espacios en medios de comunicación y otros soportes publicitarios.</h2>
-          <p class="op__org">Junta Directiva de la Asociación de Municipios Turísticos de Canarias · Tenerife</p>
-          <p class="op__summary">Solicitan un servicio de compra y gestión de espacios publicitarios en medios de comunicación y otros soportes. Es un trabajo clave de una agencia de marketing: planificación de medios, negociación de espacios y gestión de campañas publicitarias.</p>
-          <div class="op__meta">
-            <span class="op__amount">80.000,00 €</span>
-            <a class="op__link" href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=G1BuXz3LYk%2FE6P%2FuLemXRw%3D%3D" target="_blank" rel="noopener">Ver pliego →</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="op" data-isla="Tenerife" data-dias="1" data-importe="6420.0" data-texto="patrocinio por parte de sociedad insular para la promoción de las personas con discapacidad (en adelante, sinpromi), del evento denominado “buenavista diversa 2026”, que se celebrará del 18 al 20 de junio de 2026. vicepresidencia del consejo de administración de la sociedad insular para la promoción de las personas con discapacidad s.l. solicitan patrocinio para el evento &#x27;buenavista diversa 2026&#x27; que se celebrará en junio de 2026. es relevante porque una agencia de marketing y comunicación puede encargarse de la gestión, promoción, diseño de materiales, redes sociales y estrategia de comunicación del evento.">
-        <div class="op__clock op__clock--urgente">
-          <span class="op__days">1 días</span>
-          <span class="op__deadline">22 jun 2026</span>
-        </div>
-        <div class="op__body">
-          <h2 class="op__title">PATROCINIO por parte de Sociedad Insular para la Promoción de las Personas con discapacidad (en adelante, SINPROMI), del evento denominado “BUENAVISTA DIVERSA 2026”, que se celebrará del 18 al 20 de junio de 2026.</h2>
-          <p class="op__org">Vicepresidencia del Consejo de Administración de la Sociedad Insular para la Promoción de las Personas con Discapacidad S.L. · Tenerife</p>
-          <p class="op__summary">Solicitan patrocinio para el evento &#x27;Buenavista Diversa 2026&#x27; que se celebrará en junio de 2026. Es relevante porque una agencia de marketing y comunicación puede encargarse de la gestión, promoción, diseño de materiales, redes sociales y estrategia de comunicación del evento.</p>
-          <div class="op__meta">
-            <span class="op__amount">6.420,00 €</span>
-            <a class="op__link" href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=%2FAGYfWvMiqQQyBAnWzHfCg%3D%3D" target="_blank" rel="noopener">Ver pliego →</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="op" data-isla="Canarias" data-dias="25" data-importe="236800.0" data-texto="acuerdo marco para la contratación de espacios en medios de comunicación para la inserción y difusión de publicidad institucional del ayuntamiento de los realejos alcaldía del ayuntamiento de la histórica villa de los realejos contratan espacios en medios de comunicación para difundir publicidad institucional del ayuntamiento. es un trabajo de planificación y gestión de campañas de comunicación institucional que encaja perfectamente con los servicios de una agencia de marketing y comunicación.">
-        <div class="op__clock op__clock--holgado">
-          <span class="op__days">25 días</span>
-          <span class="op__deadline">16 jul 2026</span>
-        </div>
-        <div class="op__body">
-          <h2 class="op__title">Acuerdo marco para la contratación de espacios en medios de comunicación para la inserción y difusión de publicidad institucional del Ayuntamiento de Los Realejos</h2>
-          <p class="op__org">Alcaldía del Ayuntamiento de la Histórica Villa de los Realejos · Canarias</p>
-          <p class="op__summary">Contratan espacios en medios de comunicación para difundir publicidad institucional del Ayuntamiento. Es un trabajo de planificación y gestión de campañas de comunicación institucional que encaja perfectamente con los servicios de una agencia de marketing y comunicación.</p>
-          <div class="op__meta">
-            <span class="op__amount">236.800,00 €</span>
-            <a class="op__link" href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=pCu%2FuDu0ycKGCFcHcNGIlQ%3D%3D" target="_blank" rel="noopener">Ver pliego →</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="op" data-isla="Tenerife" data-dias="25" data-importe="295094.25" data-texto="dinamización juvenil y sociocultural del centros municipales y salas de estudio junta de gobierno local del ayuntamiento de granadilla de abona solicitan servicios de dinamización juvenil y sociocultural en centros municipales, que incluye diseño e implementación de actividades, eventos y programación cultural. es un trabajo perfecto para una agencia de marketing y comunicación: pueden crear estrategias de engagement, diseñar campañas de promoción de actividades, gestionar redes sociales del programa y organizar eventos socioculturales.">
-        <div class="op__clock op__clock--holgado">
-          <span class="op__days">25 días</span>
-          <span class="op__deadline">16 jul 2026</span>
-        </div>
-        <div class="op__body">
-          <h2 class="op__title">Dinamización juvenil y sociocultural del centros municipales y salas de estudio</h2>
-          <p class="op__org">Junta de Gobierno Local del Ayuntamiento de Granadilla de Abona · Tenerife</p>
-          <p class="op__summary">Solicitan servicios de dinamización juvenil y sociocultural en centros municipales, que incluye diseño e implementación de actividades, eventos y programación cultural. Es un trabajo perfecto para una agencia de marketing y comunicación: pueden crear estrategias de engagement, diseñar campañas de promoción de actividades, gestionar redes sociales del programa y organizar eventos socioculturales.</p>
-          <div class="op__meta">
-            <span class="op__amount">295.094,25 €</span>
-            <a class="op__link" href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=2evoHF8rsvZVkTabT%2FRM8A%3D%3D" target="_blank" rel="noopener">Ver pliego →</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="op" data-isla="Canarias" data-dias="8" data-importe="214000.0" data-texto="contrato de servicios de agencia de comunicación en península consejero delegado de la sociedad canaria de fomento económico s.a. - proexca buscan una agencia de comunicación para servicios de comunicación integral. es exactamente el perfil de una agencia de marketing y comunicación especializada en branding, campañas y estrategia comunicativa.">
-        <div class="op__clock op__clock--media">
-          <span class="op__days">8 días</span>
-          <span class="op__deadline">29 jun 2026</span>
-        </div>
-        <div class="op__body">
-          <h2 class="op__title">Contrato de servicios de agencia de comunicación en Península</h2>
-          <p class="op__org">Consejero Delegado de la Sociedad Canaria de Fomento Económico S.A. - PROEXCA · Canarias</p>
-          <p class="op__summary">Buscan una agencia de comunicación para servicios de comunicación integral. Es exactamente el perfil de una agencia de marketing y comunicación especializada en branding, campañas y estrategia comunicativa.</p>
-          <div class="op__meta">
-            <span class="op__amount">214.000,00 €</span>
-            <a class="op__link" href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=FO8fs7%2FOruvECtSnloz%2BZQ%3D%3D" target="_blank" rel="noopener">Ver pliego →</a>
+            <span class="op__amount">220.185,95 €</span>
+            <a class="op__link" href="https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&amp;idEvl=Qga1efTVX%2FWqb7rCcv76BA%3D%3D" target="_blank" rel="noopener">Ver pliego →</a>
           </div>
         </div>
       </article>
@@ -362,6 +123,7 @@
   const ops = Array.from(document.querySelectorAll('.op'));
   const q = document.getElementById('q');
   const isla = document.getElementById('isla');
+  const semaforo = document.getElementById('semaforo');
   const orden = document.getElementById('orden');
   const cont = document.getElementById('ops');
   const visiblesLabel = document.getElementById('visibles');
@@ -373,11 +135,13 @@
   function aplicar(){
     const texto = q.value.trim().toLowerCase();
     const islaSel = isla.value;
+    const semSel = semaforo.value;
     let visibles = 0;
     for (const o of ops){
       const okTexto = !texto || o.dataset.texto.includes(texto);
       const okIsla = !islaSel || o.dataset.isla === islaSel;
-      const mostrar = okTexto && okIsla;
+      const okSemaforo = !semSel || o.dataset.semaforo === semSel;
+      const mostrar = okTexto && okIsla && okSemaforo;
       o.style.display = mostrar ? '' : 'none';
       if (mostrar) visibles++;
     }
@@ -393,6 +157,7 @@
   }
   q.addEventListener('input', aplicar);
   isla.addEventListener('change', aplicar);
+  semaforo.addEventListener('change', aplicar);
   orden.addEventListener('change', aplicar);
   aplicar();
 </script>

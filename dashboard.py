@@ -49,6 +49,9 @@ def urgencia(dias):
     return "holgado", f"{dias} días"
 
 
+SEMAFORO_ETIQUETA = {"verde": "🟢 Prioridad", "naranja": "🟠 Valorar", "rojo": "🔴 Descartar"}
+
+
 def tarjeta_html(item):
     dias = dias_restantes(item.get("plazo"))
     clase, etiqueta = urgencia(dias)
@@ -57,16 +60,22 @@ def tarjeta_html(item):
         imp = float(item.get("importe"))
     except (TypeError, ValueError):
         imp = 0
+    semaforo = item.get("semaforo") or "naranja"
+    sem_etiqueta = SEMAFORO_ETIQUETA.get(semaforo, SEMAFORO_ETIQUETA["naranja"])
+    motivos = item.get("motivos") or []
+    sem_tooltip = " · ".join(motivos)
     return f"""
-      <article class="op" data-isla="{html.escape(isla)}" data-dias="{dias if dias is not None else 99999}" data-importe="{imp}" data-texto="{html.escape((item.get('titulo','') + ' ' + item.get('organo','') + ' ' + item.get('resumen','')).lower())}">
+      <article class="op" data-isla="{html.escape(isla)}" data-dias="{dias if dias is not None else 99999}" data-importe="{imp}" data-semaforo="{html.escape(semaforo)}" data-texto="{html.escape((item.get('titulo','') + ' ' + item.get('organo','') + ' ' + item.get('resumen','')).lower())}">
         <div class="op__clock op__clock--{clase}">
           <span class="op__days">{html.escape(etiqueta)}</span>
           <span class="op__deadline">{html.escape(formatear_fecha(item.get("plazo")))}</span>
         </div>
         <div class="op__body">
+          <div class="op__semaforo op__semaforo--{html.escape(semaforo)}" title="{html.escape(sem_tooltip)}">{html.escape(sem_etiqueta)}</div>
           <h2 class="op__title">{html.escape(item.get("titulo") or "")}</h2>
           <p class="op__org">{html.escape(item.get("organo") or "")}{(" · " + html.escape(isla)) if isla else ""}</p>
           <p class="op__summary">{html.escape(item.get("resumen") or "")}</p>
+          {f'<p class="op__motivos">{html.escape(sem_tooltip)}</p>' if sem_tooltip else ""}
           <div class="op__meta">
             <span class="op__amount">{html.escape(formatear_importe(item.get("importe")))}</span>
             <a class="op__link" href="{html.escape(item.get("enlace") or "#")}" target="_blank" rel="noopener">Ver pliego →</a>
@@ -120,6 +129,13 @@ CABECERA = r"""<!doctype html>
   .op__days{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:22px;line-height:1;}
   .op__deadline{font-size:11px;opacity:.9;}
   .op__body{padding:20px 22px;}
+  .op__semaforo{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:11px;
+    font-weight:600;letter-spacing:.04em;padding:3px 9px;border-radius:20px;margin:0 0 10px;
+    cursor:default;}
+  .op__semaforo--verde{background:#e3f3ec;color:#1f6b50;}
+  .op__semaforo--naranja{background:#fbeed9;color:#95611a;}
+  .op__semaforo--rojo{background:#fbe2dc;color:#a6402a;}
+  .op__motivos{font-size:12.5px;color:var(--ink-soft);margin:-8px 0 14px;font-style:italic;}
   .op__title{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;
     font-size:19px;line-height:1.22;margin:0 0 6px;letter-spacing:-.01em;}
   .op__org{font-size:13px;color:var(--ink-soft);margin:0 0 12px;}
@@ -151,6 +167,12 @@ CABECERA = r"""<!doctype html>
     <select id="isla">
       <option value="">Todas las islas</option>
     </select>
+    <select id="semaforo">
+      <option value="">Todas las prioridades</option>
+      <option value="verde">🟢 Prioridad</option>
+      <option value="naranja">🟠 Valorar</option>
+      <option value="rojo">🔴 Descartar</option>
+    </select>
     <select id="orden">
       <option value="plazo">Vence antes</option>
       <option value="importe">Mayor importe</option>
@@ -168,6 +190,7 @@ CABECERA = r"""<!doctype html>
   const ops = Array.from(document.querySelectorAll('.op'));
   const q = document.getElementById('q');
   const isla = document.getElementById('isla');
+  const semaforo = document.getElementById('semaforo');
   const orden = document.getElementById('orden');
   const cont = document.getElementById('ops');
   const visiblesLabel = document.getElementById('visibles');
@@ -179,11 +202,13 @@ CABECERA = r"""<!doctype html>
   function aplicar(){
     const texto = q.value.trim().toLowerCase();
     const islaSel = isla.value;
+    const semSel = semaforo.value;
     let visibles = 0;
     for (const o of ops){
       const okTexto = !texto || o.dataset.texto.includes(texto);
       const okIsla = !islaSel || o.dataset.isla === islaSel;
-      const mostrar = okTexto && okIsla;
+      const okSemaforo = !semSel || o.dataset.semaforo === semSel;
+      const mostrar = okTexto && okIsla && okSemaforo;
       o.style.display = mostrar ? '' : 'none';
       if (mostrar) visibles++;
     }
@@ -199,6 +224,7 @@ CABECERA = r"""<!doctype html>
   }
   q.addEventListener('input', aplicar);
   isla.addEventListener('change', aplicar);
+  semaforo.addEventListener('change', aplicar);
   orden.addEventListener('change', aplicar);
   aplicar();
 </script>
