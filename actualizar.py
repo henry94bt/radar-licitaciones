@@ -20,9 +20,33 @@ KEYWORDS = [
     "publicidad", "comunicacion", "campana", "marketing", "difusion",
     "promocion", "diseno", "branding", "marca", "redes sociales",
     "social media", "contenido", "web", "audiovisual", "video", "imagen",
-    "iluminacion", "sonido", "grabacion", "streaming", "evento", "patrocinio",
-    "artistic", "produccion", "prensa", "medios", "grafic", "espectaculo",
-    "festival", "feria", "cultural", "dinamizacion",
+    "grafic", "evento",
+]
+# Quitados respecto a la version anterior por traer demasiado ruido (obra
+# publica, sanidad, servicios sociales, telecom disfrazados de "cultural" o
+# "dinamizacion"): iluminacion, sonido, cultural, festival, feria, artistic,
+# espectaculo, dinamizacion, patrocinio, streaming, prensa, medios,
+# produccion. Si una candidata legitima se pierde por esto, es mas barato
+# recuperarla a mano puntualmente que pagar el ruido de tenerlas todas.
+
+# CPV cuyo prefijo, si aparece, mete la candidata igual aunque el titulo no
+# tenga ninguna KEYWORD (a veces el organo clasifica mal el titulo).
+CPV_RELEVANTES = [
+    "7934", "79822500", "79823000", "92111", "72400000", "72413000", "79416",
+]
+
+# Si el titulo contiene cualquiera de estos, se descarta ANTES de llamar a la
+# IA, aunque haya matcheado una keyword o CPV (ahorra la llamada y el ruido).
+# Son objetos que el GEM descarta siempre: obra civil, suministro de equipos/
+# material, mantenimiento tecnico, sanidad, servicios sociales, telecom.
+EXCLUSIONES = [
+    "obra de", "obras de", "edificacion", "vivienda", "asfaltado",
+    "servidor", "servidores", "software especifico", "radiocomunicaciones",
+    "telecomunicaciones", "mantenimiento electrico", "instalacion electrica",
+    "reparacion de iluminacion", "resonancia", "diagnostico por imagen",
+    "desratizacion", "desinsectacion", "legionella", "tarima", "tarimas",
+    "suministro e instalacion", "suministro de", "catering", "limpieza",
+    "transporte regular", "certificacion iso", "iso 9001", "fluido electrico",
 ]
 
 cliente = Anthropic()
@@ -80,9 +104,14 @@ def sin_tildes(s):
                    if unicodedata.category(c) != "Mn").lower()
 
 
-def es_candidata(titulo):
-    t = sin_tildes(titulo)
-    return any(k in t for k in KEYWORDS)
+def es_candidata(row):
+    t = sin_tildes(row.get("titulo", ""))
+    if any(ex in t for ex in EXCLUSIONES):
+        return False
+    if any(k in t for k in KEYWORDS):
+        return True
+    cpv = str(row.get("cpv") or "")
+    return any(cpv.startswith(pref) for pref in CPV_RELEVANTES)
 
 
 def evaluar(row):
@@ -124,8 +153,8 @@ def main():
 
     # Filtro 1: Canarias
     df = df[df["nuts"].fillna("").str.startswith("ES70")]
-    # Filtro 2: tematica (titulo con keyword)
-    df = df[df["titulo"].apply(es_candidata)]
+    # Filtro 2: tematica (keyword de titulo O cpv relevante, vetado por exclusiones)
+    df = df[df.apply(es_candidata, axis=1)]
     # Filtro 3: en plazo (fecha de cierre futura). Las fechas ISO se comparan como texto.
     hoy = date.today().isoformat()
     df = df[df["plazo"].fillna("") >= hoy]
