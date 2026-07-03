@@ -65,7 +65,7 @@ def tarjeta_html(item):
     motivos = item.get("motivos") or []
     sem_tooltip = " · ".join(motivos)
     return f"""
-      <article class="op" data-isla="{html.escape(isla)}" data-dias="{dias if dias is not None else 99999}" data-importe="{imp}" data-semaforo="{html.escape(semaforo)}" data-texto="{html.escape((item.get('titulo','') + ' ' + item.get('organo','') + ' ' + item.get('resumen','')).lower())}">
+      <article class="op" data-isla="{html.escape(isla)}" data-dias="{dias if dias is not None else 99999}" data-importe="{imp}" data-semaforo="{html.escape(semaforo)}" data-relevante="{str(bool(item.get('relevante', True))).lower()}" data-texto="{html.escape((item.get('titulo','') + ' ' + item.get('organo','') + ' ' + item.get('resumen','')).lower())}">
         <div class="op__clock op__clock--{clase}">
           <span class="op__days">{html.escape(etiqueta)}</span>
           <span class="op__deadline">{html.escape(formatear_fecha(item.get("plazo")))}</span>
@@ -136,6 +136,8 @@ CABECERA = r"""<!doctype html>
   .op__semaforo--naranja{background:#fbeed9;color:#95611a;}
   .op__semaforo--rojo{background:#fbe2dc;color:#a6402a;}
   .op__motivos{font-size:12.5px;color:var(--ink-soft);margin:-8px 0 14px;font-style:italic;}
+  .op[data-relevante="false"]{opacity:.6;}
+  .op[data-relevante="false"] .op__title{font-size:17px;}
   .op__title{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;
     font-size:19px;line-height:1.22;margin:0 0 6px;letter-spacing:-.01em;}
   .op__org{font-size:13px;color:var(--ink-soft);margin:0 0 12px;}
@@ -168,17 +170,18 @@ CABECERA = r"""<!doctype html>
       <option value="">Todas las islas</option>
     </select>
     <select id="semaforo">
-      <option value="">Todas las prioridades</option>
+      <option value="">Oportunidades (verde/naranja)</option>
+      <option value="todas">Todas, incl. descartadas</option>
       <option value="verde">🟢 Prioridad</option>
       <option value="naranja">🟠 Valorar</option>
-      <option value="rojo">🔴 Descartar</option>
+      <option value="rojo">🔴 Descartadas</option>
     </select>
     <select id="orden">
       <option value="plazo">Vence antes</option>
       <option value="importe">Mayor importe</option>
     </select>
   </div>
-  <p class="count"><strong id="visibles">@@RECUENTO@@</strong> de @@RECUENTO@@ oportunidades · Actualizado @@FECHA@@</p>
+  <p class="count"><strong id="visibles">@@RECOMENDADAS@@</strong> de @@TOTAL@@ analizadas · @@RECOMENDADAS@@ oportunidades · Actualizado @@FECHA@@</p>
   <main class="ops" id="ops">
 @@TARJETAS@@
   </main>
@@ -207,7 +210,9 @@ CABECERA = r"""<!doctype html>
     for (const o of ops){
       const okTexto = !texto || o.dataset.texto.includes(texto);
       const okIsla = !islaSel || o.dataset.isla === islaSel;
-      const okSemaforo = !semSel || o.dataset.semaforo === semSel;
+      const okSemaforo = semSel === '' ? o.dataset.semaforo !== 'rojo'
+        : semSel === 'todas' ? true
+        : o.dataset.semaforo === semSel;
       const mostrar = okTexto && okIsla && okSemaforo;
       o.style.display = mostrar ? '' : 'none';
       if (mostrar) visibles++;
@@ -239,8 +244,11 @@ def generar_html(items):
         tarjetas = '<div class="empty">No hay oportunidades abiertas ahora mismo. El radar seguira mirando.</div>'
     hoy = date.today()
     fecha_txt = f"{hoy.day} {MESES[hoy.month]} {hoy.year}"
+    total = len(items)
+    recomendadas = sum(1 for it in items if it.get("relevante", True))
     doc = (CABECERA
-           .replace("@@RECUENTO@@", str(len(items)))
+           .replace("@@TOTAL@@", str(total))
+           .replace("@@RECOMENDADAS@@", str(recomendadas))
            .replace("@@FECHA@@", fecha_txt)
            .replace("@@TARJETAS@@", tarjetas))
     os.makedirs("docs", exist_ok=True)

@@ -14,7 +14,7 @@ ANIO_MES = "202606"
 URL = f"https://contrataciondelsectorpublico.gob.es/sindicacion/sindicacion_643/licitacionesPerfilesContratanteCompleto3_{ANIO_MES}.zip"
 MODELO = "claude-haiku-4-5-20251001"
 SALIDA_JSON = "data/relevantes.json"
-MAX_CANDIDATAS = 40  # tope de seguridad para no disparar tiempo/coste de IA
+MAX_CANDIDATAS = 150  # tope de seguridad, no limitacion real (antes 40, era para la demo)
 
 KEYWORDS = [
     "publicidad", "comunicacion", "campana", "marketing", "difusion",
@@ -57,14 +57,18 @@ SYSTEM = (
     "- rojo: no se cumple ninguno de los anteriores pero aun asi decides relevante=true "
     "por algun motivo puntual (raro; normalmente rojo va con relevante=false).\n"
     "\n"
+    "En 'resumen' pon SIEMPRE dos frases en espanol, sea o no relevante: que se esta "
+    "contratando (en cristiano) y, si no es relevante, por que no encaja. "
+    "Ejemplo si no relevante: 'Suministro e instalacion de servidores para el "
+    "ayuntamiento. No es un servicio de marketing ni comunicacion.'"
+    "\n\n"
     "Responde SOLO con un JSON valido, sin markdown ni texto extra, con esta forma exacta: "
     '{"relevante": true, "semaforo": "verde", "motivos": ["..."], "resumen": "..."}. '
     "En 'motivos' pon SIEMPRE 1-3 frases cortas en espanol citando la regla concreta "
     "aplicada, tanto si es relevante como si no (ej: 'Evento en Tenerife, fuera de Gran "
     "Canaria' o 'Diseno y RRSS, encaje core'). Se breve: cada motivo debe caber en una "
     "linea, no expliques de mas. "
-    "En 'resumen' pon dos frases: que piden y por que le encaja (o no) a la agencia. "
-    "Si no es relevante, pon \"relevante\": false, \"semaforo\": \"rojo\" y \"resumen\": \"\"."
+    "Si no es relevante, pon \"relevante\": false y \"semaforo\": \"rojo\"."
 )
 
 SEMAFORO_ICONO = {"verde": "🟢", "naranja": "🟠", "rojo": "🔴"}
@@ -131,11 +135,10 @@ def main():
 
     if len(df) > MAX_CANDIDATAS:
         df = df.head(MAX_CANDIDATAS)
-        print(f"(limito a {MAX_CANDIDATAS} para no alargar la demo)")
+        print(f"(tope de seguridad: limito a {MAX_CANDIDATAS})")
 
     print("Pasandolas por la IA...")
     items = []
-    descartadas = 0
     for _, row in df.iterrows():
         try:
             v = evaluar(row)
@@ -143,26 +146,25 @@ def main():
             print(f"(salto una por un error: {e})")
             continue
         titulo_corto = row["titulo"][:70]
-        if v.get("relevante"):
-            items.append({
-                "titulo": row["titulo"], "organo": row["organo"],
-                "importe": row["importe"], "plazo": row["plazo"],
-                "lugar": row.get("lugar"), "enlace": row["enlace"],
-                "resumen": v.get("resumen", ""),
-                "semaforo": v.get("semaforo", "naranja"),
-                "motivos": v.get("motivos", []),
-            })
-            print(f"  {SEMAFORO_ICONO.get(v.get('semaforo'), '⚪')} {titulo_corto}")
-        else:
-            descartadas += 1
-            motivos = "; ".join(v.get("motivos", []))
-            print(f"  ⛔ {titulo_corto}  →  {motivos}")
+        semaforo = v.get("semaforo") or ("verde" if v.get("relevante") else "rojo")
+        items.append({
+            "titulo": row["titulo"], "organo": row["organo"],
+            "importe": row["importe"], "plazo": row["plazo"],
+            "lugar": row.get("lugar"), "enlace": row["enlace"],
+            "resumen": v.get("resumen", ""),
+            "relevante": bool(v.get("relevante")),
+            "semaforo": semaforo,
+            "motivos": v.get("motivos", []),
+        })
+        icono = "⛔" if not v.get("relevante") else SEMAFORO_ICONO.get(semaforo, "⚪")
+        print(f"  {icono} {titulo_corto}")
 
-    # Orden: primero verdes, luego naranjas, dentro de cada grupo por plazo mas cercano.
+    # Orden: primero verdes, luego naranjas, luego rojas; dentro de cada grupo por plazo.
     orden_semaforo = {"verde": 0, "naranja": 1, "rojo": 2}
     items.sort(key=lambda it: (orden_semaforo.get(it.get("semaforo"), 1), it.get("plazo") or ""))
 
-    print(f"La IA descarto {descartadas}. Quedan {len(items)} recomendadas.")
+    recomendadas = sum(1 for it in items if it["relevante"])
+    print(f"{len(items)} analizadas. {recomendadas} recomendadas, {len(items) - recomendadas} descartadas (guardadas igualmente con motivo).")
     os.makedirs("data", exist_ok=True)
     with open(SALIDA_JSON, "w", encoding="utf-8") as f:
         json.dump(items, f, ensure_ascii=False, indent=2)
