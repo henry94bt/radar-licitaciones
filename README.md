@@ -6,7 +6,7 @@ a una agencia de marketing/comunicación, las evalúa contra el perfil real de
 priorizadas en un dashboard, cada vez que lo ejecutas.
 
 > Para el contexto completo de cómo ha evolucionado esta herramienta —de demo
-> a algo que ya usa criterio de negocio real— ver [`HISTORIAL.md`](HISTORIAL.md).
+> a algo que ya usa criterio de negocio real— ver [`historial.md`](historial.md).
 
 ---
 
@@ -79,7 +79,7 @@ versión resumida de sus reglas de encaje, sin esos datos sensibles.
 ```
 radar-licitaciones/
 ├── README.md            ← este archivo
-├── HISTORIAL.md          ← de dónde viene esto y qué ha cambiado en cada fase
+├── historial.md          ← de dónde viene esto y qué ha cambiado en cada fase
 ├── requirements.txt
 ├── actualizar.py         ← ★ pipeline real: descarga + filtro + evaluación IA
 ├── dashboard.py           ← ★ pipeline real: genera docs/index.html
@@ -99,7 +99,7 @@ radar-licitaciones/
 
 > ⚠️ **Nota sobre `src/`:** este proyecto arrancó como un esqueleto modular
 > (`main.py` orquestando `src/descarga.py → parseo.py → filtro.py → resumen.py
-> → dashboard.py`, ver Fase 0 en `HISTORIAL.md`). En la práctica, el pipeline
+> → dashboard.py`, ver Fase 0 en `historial.md`). En la práctica, el pipeline
 > que se terminó de construir y usa datos reales vive en los dos archivos de
 > la raíz (`actualizar.py`, `dashboard.py`), que son autocontenidos y más
 > simples de mantener. El único archivo de `src/` que sigue en uso es
