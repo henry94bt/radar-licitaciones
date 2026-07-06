@@ -24,7 +24,9 @@ jobs:
       - name: Ejecutar el radar
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: python main.py
+        run: |
+          python actualizar.py
+          python dashboard.py
 
       - name: Publicar resultado
         run: |

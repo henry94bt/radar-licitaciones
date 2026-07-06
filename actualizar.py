@@ -9,8 +9,11 @@ import pandas as pd
 from anthropic import Anthropic
 from src.parseo import parsear_bytes
 
-# Mes a consultar, en formato AAAAMM. Cambia esto cuando quieras otro mes.
-ANIO_MES = "202606"
+# Mes a consultar, en formato AAAAMM. Se calcula solo (mes actual) para que
+# la automatización diaria siempre pida el mes correcto. Si necesitas forzar
+# un mes concreto para pruebas, pon aqui el valor fijo en vez de la linea de
+# abajo (ej: ANIO_MES = "202606").
+ANIO_MES = date.today().strftime("%Y%m")
 URL = f"https://contrataciondelsectorpublico.gob.es/sindicacion/sindicacion_643/licitacionesPerfilesContratanteCompleto3_{ANIO_MES}.zip"
 MODELO = "claude-haiku-4-5-20251001"
 SALIDA_JSON = "data/relevantes.json"
