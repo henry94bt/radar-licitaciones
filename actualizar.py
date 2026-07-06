@@ -107,6 +107,15 @@ def sin_tildes(s):
                    if unicodedata.category(c) != "Mn").lower()
 
 
+def limpio(v):
+    """Convierte NaN de pandas (o cualquier float 'raro') a None; deja el
+    resto tal cual. Evita que un hueco vacio del XML (ej. lugar sin
+    especificar) llegue al JSON como NaN y rompa luego el HTML."""
+    if isinstance(v, float) and v != v:  # el truco clasico: NaN != NaN
+        return None
+    return v
+
+
 def es_candidata(row):
     t = sin_tildes(row.get("titulo", ""))
     if any(ex in t for ex in EXCLUSIONES):
@@ -123,7 +132,7 @@ def evaluar(row):
         f"Organo: {row['organo']}\n"
         f"Importe: {row['importe']}\n"
         f"Plazo: {row['plazo']}\n"
-        f"Lugar de ejecucion: {row.get('lugar') or '(no especificado)'}\n"
+        f"Lugar de ejecucion: {limpio(row.get('lugar')) or '(no especificado)'}\n"
         f"CPV: {row['cpv']}"
     )
     resp = cliente.messages.create(
@@ -180,9 +189,9 @@ def main():
         titulo_corto = row["titulo"][:70]
         semaforo = v.get("semaforo") or ("verde" if v.get("relevante") else "rojo")
         items.append({
-            "titulo": row["titulo"], "organo": row["organo"],
-            "importe": row["importe"], "plazo": row["plazo"],
-            "lugar": row.get("lugar"), "enlace": row["enlace"],
+            "titulo": limpio(row["titulo"]), "organo": limpio(row["organo"]),
+            "importe": limpio(row["importe"]), "plazo": limpio(row["plazo"]),
+            "lugar": limpio(row.get("lugar")), "enlace": limpio(row["enlace"]),
             "resumen": v.get("resumen", ""),
             "relevante": bool(v.get("relevante")),
             "semaforo": semaforo,

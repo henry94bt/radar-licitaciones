@@ -56,6 +56,17 @@ def tarjeta_html(item):
     dias = dias_restantes(item.get("plazo"))
     clase, etiqueta = urgencia(dias)
     isla = item.get("lugar") or ""
+    if not isinstance(isla, str):
+        isla = ""  # por si llega None/NaN/lo que sea en vez de texto
+    titulo = item.get("titulo") or ""
+    organo = item.get("organo") or ""
+    resumen = item.get("resumen") or ""
+    if not isinstance(titulo, str):
+        titulo = ""
+    if not isinstance(organo, str):
+        organo = ""
+    if not isinstance(resumen, str):
+        resumen = ""
     try:
         imp = float(item.get("importe"))
     except (TypeError, ValueError):
@@ -65,16 +76,16 @@ def tarjeta_html(item):
     motivos = item.get("motivos") or []
     sem_tooltip = " · ".join(motivos)
     return f"""
-      <article class="op" data-isla="{html.escape(isla)}" data-dias="{dias if dias is not None else 99999}" data-importe="{imp}" data-semaforo="{html.escape(semaforo)}" data-relevante="{str(bool(item.get('relevante', True))).lower()}" data-texto="{html.escape((item.get('titulo','') + ' ' + item.get('organo','') + ' ' + item.get('resumen','')).lower())}">
+      <article class="op" data-isla="{html.escape(isla)}" data-dias="{dias if dias is not None else 99999}" data-importe="{imp}" data-semaforo="{html.escape(semaforo)}" data-relevante="{str(bool(item.get('relevante', True))).lower()}" data-texto="{html.escape((titulo + ' ' + organo + ' ' + resumen).lower())}">
         <div class="op__clock op__clock--{clase}">
           <span class="op__days">{html.escape(etiqueta)}</span>
           <span class="op__deadline">{html.escape(formatear_fecha(item.get("plazo")))}</span>
         </div>
         <div class="op__body">
           <div class="op__semaforo op__semaforo--{html.escape(semaforo)}" title="{html.escape(sem_tooltip)}">{html.escape(sem_etiqueta)}</div>
-          <h2 class="op__title">{html.escape(item.get("titulo") or "")}</h2>
-          <p class="op__org">{html.escape(item.get("organo") or "")}{(" · " + html.escape(isla)) if isla else ""}</p>
-          <p class="op__summary">{html.escape(item.get("resumen") or "")}</p>
+          <h2 class="op__title">{html.escape(titulo)}</h2>
+          <p class="op__org">{html.escape(organo)}{(" · " + html.escape(isla)) if isla else ""}</p>
+          <p class="op__summary">{html.escape(resumen)}</p>
           {f'<p class="op__motivos">{html.escape(sem_tooltip)}</p>' if sem_tooltip else ""}
           <div class="op__meta">
             <span class="op__amount">{html.escape(formatear_importe(item.get("importe")))}</span>
