@@ -28,6 +28,12 @@ jobs:
           python actualizar.py
           python dashboard.py
 
+      - name: Enviar email diario
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+        run: python -m src.email_diario
+
       - name: Publicar resultado
         run: |
           git config user.name "github-actions"

@@ -2,7 +2,7 @@
 Paso 6 — EMAIL DIARIO
 Mismo contenido que el dashboard, en formato email. Dos modos:
   - generar el .html del email (seguro para la demo: lo enseñas sin enviar nada)
-  - enviarlo de verdad por SMTP (opcional, sin implementar todavia)
+  - enviarlo de verdad por SMTP (IONOS)
 """
 import json
 import smtplib
@@ -38,17 +38,25 @@ def guardar_email(items: list[dict], ruta: str = "docs/email_preview.html") -> N
 
 
 def enviar_email(items: list[dict]) -> None:
-    """
-    Modo real (opcional): envía por SMTP.
-    Credenciales por variable de entorno: SMTP_USER, SMTP_PASS.
-    Con Gmail necesitas una 'contraseña de aplicación', no la normal.
+    """Envía el resumen por SMTP (IONOS). Credenciales por variable de
+    entorno: SMTP_USER (buzón remitente) y SMTP_PASS (su contraseña)."""
+    usuario = os.environ["SMTP_USER"]
+    clave = os.environ["SMTP_PASS"]
 
-    TODO: rellenar solo si decides enviarlo de verdad. Para la demo basta guardar.
-    """
-    raise NotImplementedError("Opcional — rellenar si quieres envío real por SMTP")
+    msg = MIMEText(construir_email_html(items), "html", "utf-8")
+    msg["Subject"] = config.EMAIL_ASUNTO
+    msg["From"] = config.EMAIL_REMITENTE
+    msg["To"] = ", ".join(config.EMAIL_DESTINO)
+
+    with smtplib.SMTP(config.SMTP_HOST, config.SMTP_PORT) as server:
+        server.starttls()
+        server.login(usuario, clave)
+        server.sendmail(config.EMAIL_REMITENTE, config.EMAIL_DESTINO, msg.as_string())
+    print(f"Email enviado a {', '.join(config.EMAIL_DESTINO)}")
 
 
 if __name__ == "__main__":
     with open("data/relevantes.json", encoding="utf-8") as f:
         items = json.load(f)
     guardar_email(items)
+    enviar_email(items)

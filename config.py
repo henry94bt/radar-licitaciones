@@ -79,6 +79,12 @@ MAX_LICITACIONES_A_RESUMIR = 15           # tope para la demo (controla coste/ti
 RUTA_DASHBOARD = "docs/index.html"
 TITULO_DASHBOARD = "Radar de Licitaciones · Canarias · Comunicación & Marketing"
 
-# Email (solo se usa si decides enviarlo de verdad; si no, se genera el .html)
-EMAIL_DESTINO = "TODO_correo@ejemplo.com"
+# Email
+EMAIL_REMITENTE = "henry@lapepastudio.com"
+EMAIL_DESTINO = ["hola@lapepastudio.com", "administracion@lapepastudio.com"]
 EMAIL_ASUNTO = "📡 Licitaciones del día que os pueden interesar"
+
+# SMTP de IONOS. Usuario/contraseña vienen de variables de entorno
+# (SMTP_USER / SMTP_PASS), nunca hardcodeadas aquí.
+SMTP_HOST = "smtp.ionos.es"
+SMTP_PORT = 587
