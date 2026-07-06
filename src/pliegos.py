@@ -19,7 +19,12 @@ import requests
 from pypdf import PdfReader
 
 TAMANO_MAX_BYTES = 15_000_000  # 15 MB, para no colgarnos con un pliego enorme
-CARACTERES_MAX_POR_DOC = 8000  # tope de texto que mandamos a la IA (coste/tokens)
+# Tope de texto que mandamos a la IA por documento. Los primeros miles de
+# caracteres de un PCAP suelen ser solo el indice (paginas de sumario), asi
+# que un tope bajo se queda sin llegar al contenido real (solvencia,
+# garantia, criterios). 30000 caracteres (~7-8k tokens) da margen de sobra
+# para pasar el indice y llegar al cuerpo, con coste todavia bajo en Haiku.
+CARACTERES_MAX_POR_DOC = 30000
 
 
 def _descargar(tipo, valor):
