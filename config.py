@@ -79,12 +79,9 @@ MAX_LICITACIONES_A_RESUMIR = 15           # tope para la demo (controla coste/ti
 RUTA_DASHBOARD = "docs/index.html"
 TITULO_DASHBOARD = "Radar de Licitaciones · Canarias · Comunicación & Marketing"
 
-# Email
+# Email. Se envía vía API de Resend (RESEND_API_KEY como variable de
+# entorno/GitHub Secret). EMAIL_REMITENTE debe ser de un dominio verificado
+# en Resend (verificar lapepastudio.com ahí antes de usar henry@... aquí).
 EMAIL_REMITENTE = "henry@lapepastudio.com"
 EMAIL_DESTINO = ["hola@lapepastudio.com", "administracion@lapepastudio.com"]
 EMAIL_ASUNTO = "📡 Licitaciones del día que os pueden interesar"
-
-# SMTP de IONOS. Usuario/contraseña vienen de variables de entorno
-# (SMTP_USER / SMTP_PASS), nunca hardcodeadas aquí.
-SMTP_HOST = "smtp.ionos.es"
-SMTP_PORT = 587

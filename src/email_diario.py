@@ -2,12 +2,12 @@
 Paso 6 — EMAIL DIARIO
 Mismo contenido que el dashboard, en formato email. Dos modos:
   - generar el .html del email (seguro para la demo: lo enseñas sin enviar nada)
-  - enviarlo de verdad por SMTP (IONOS)
+  - enviarlo de verdad vía API de Resend (SMTP de IONOS no vale: bloquea
+    logins desde las IPs de datacenter de GitHub Actions)
 """
 import json
-import smtplib
 import os
-from email.mime.text import MIMEText
+import requests
 
 import config
 
@@ -38,20 +38,21 @@ def guardar_email(items: list[dict], ruta: str = "docs/email_preview.html") -> N
 
 
 def enviar_email(items: list[dict]) -> None:
-    """Envía el resumen por SMTP (IONOS). Credenciales por variable de
-    entorno: SMTP_USER (buzón remitente) y SMTP_PASS (su contraseña)."""
-    usuario = os.environ["SMTP_USER"]
-    clave = os.environ["SMTP_PASS"]
-
-    msg = MIMEText(construir_email_html(items), "html", "utf-8")
-    msg["Subject"] = config.EMAIL_ASUNTO
-    msg["From"] = config.EMAIL_REMITENTE
-    msg["To"] = ", ".join(config.EMAIL_DESTINO)
-
-    with smtplib.SMTP(config.SMTP_HOST, config.SMTP_PORT) as server:
-        server.starttls()
-        server.login(usuario, clave)
-        server.sendmail(config.EMAIL_REMITENTE, config.EMAIL_DESTINO, msg.as_string())
+    """Envía el resumen vía API de Resend (HTTPS, no SMTP). Credenciales
+    por variable de entorno: RESEND_API_KEY."""
+    api_key = os.environ["RESEND_API_KEY"]
+    resp = requests.post(
+        "https://api.resend.com/emails",
+        headers={"Authorization": f"Bearer {api_key}"},
+        json={
+            "from": config.EMAIL_REMITENTE,
+            "to": config.EMAIL_DESTINO,
+            "subject": config.EMAIL_ASUNTO,
+            "html": construir_email_html(items),
+        },
+        timeout=30,
+    )
+    resp.raise_for_status()
     print(f"Email enviado a {', '.join(config.EMAIL_DESTINO)}")
 
 

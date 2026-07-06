@@ -8,6 +8,7 @@ import requests
 import pandas as pd
 from anthropic import Anthropic
 from src.parseo import parsear_bytes
+from src.pliegos import obtener_texto_pliego
 
 # Mes a consultar, en formato AAAAMM. Se calcula solo (mes actual) para que
 # la automatización diaria siempre pida el mes correcto. Si necesitas forzar
@@ -100,6 +101,35 @@ SYSTEM = (
 
 SEMAFORO_ICONO = {"verde": "🟢", "naranja": "🟠", "rojo": "🔴"}
 
+SYSTEM_DETALLE = (
+    "Eres el analista de licitaciones de LA PEPA STUDIO. Te paso el texto extraido "
+    "del PCAP (pliego administrativo) y/o PPT (pliego tecnico) de una licitacion. "
+    "Extrae SOLO lo que encuentres explicitamente en el texto; si un dato no aparece, "
+    "pon null (no lo inventes).\n\n"
+    "Responde SOLO con un JSON valido, sin markdown ni texto extra, con esta forma "
+    "exacta:\n"
+    '{"criterios_valoracion": "...", "solvencia": "...", "garantia": "...", '
+    '"plazo_ejecucion": "...", "lotes": "..."}\n\n'
+    "- criterios_valoracion: como se puntua (ej. '60% precio, 40% memoria tecnica').\n"
+    "- solvencia: requisitos de solvencia tecnica/economica exigidos para presentarse.\n"
+    "- garantia: importe o porcentaje de garantia provisional/definitiva, si se exige.\n"
+    "- plazo_ejecucion: duracion del contrato una vez adjudicado.\n"
+    "- lotes: si se divide en lotes, cuales y de que trata cada uno; si no hay lotes, "
+    "pon 'Sin lotes'.\n"
+    "Cada campo, 1-2 frases cortas en espanol. Si no hay texto suficiente para "
+    "extraer nada de un campo, pon null en ese campo."
+)
+
+
+def evaluar_detalle(texto_pliego):
+    resp = cliente.messages.create(
+        model=MODELO, max_tokens=500, system=SYSTEM_DETALLE,
+        messages=[{"role": "user", "content": texto_pliego}],
+    )
+    texto = resp.content[0].text.strip()
+    texto = texto.replace("```json", "").replace("```", "").strip()
+    return json.loads(texto)
+
 
 def sin_tildes(s):
     s = s or ""
@@ -188,6 +218,16 @@ def main():
             continue
         titulo_corto = row["titulo"][:70]
         semaforo = v.get("semaforo") or ("verde" if v.get("relevante") else "rojo")
+
+        detalle_pliego = None
+        if semaforo in ("verde", "naranja"):
+            texto_pliego = obtener_texto_pliego(row)
+            if texto_pliego:
+                try:
+                    detalle_pliego = evaluar_detalle(texto_pliego)
+                except Exception as e:
+                    print(f"    (sin detalle de pliego, fallo al analizarlo: {e})")
+
         items.append({
             "titulo": limpio(row["titulo"]), "organo": limpio(row["organo"]),
             "importe": limpio(row["importe"]), "plazo": limpio(row["plazo"]),
@@ -196,9 +236,11 @@ def main():
             "relevante": bool(v.get("relevante")),
             "semaforo": semaforo,
             "motivos": v.get("motivos", []),
+            "detalle_pliego": detalle_pliego,
         })
         icono = "⛔" if not v.get("relevante") else SEMAFORO_ICONO.get(semaforo, "⚪")
-        print(f"  {icono} {titulo_corto}")
+        extra = " 📄" if detalle_pliego else ""
+        print(f"  {icono} {titulo_corto}{extra}")
 
     # Orden: primero verdes, luego naranjas, luego rojas; dentro de cada grupo por plazo.
     orden_semaforo = {"verde": 0, "naranja": 1, "rojo": 2}

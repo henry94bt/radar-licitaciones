@@ -51,6 +51,33 @@ def urgencia(dias):
 
 SEMAFORO_ETIQUETA = {"verde": "🟢 Prioridad", "naranja": "🟠 Valorar", "rojo": "🔴 Descartar"}
 
+CAMPOS_DETALLE = [
+    ("criterios_valoracion", "Criterios de valoración"),
+    ("solvencia", "Solvencia exigida"),
+    ("garantia", "Garantía"),
+    ("plazo_ejecucion", "Plazo de ejecución"),
+    ("lotes", "Lotes"),
+]
+
+
+def bloque_detalle_pliego(detalle):
+    """Devuelve el HTML del desplegable con el detalle del pliego (Fase 2),
+    o cadena vacía si no hay nada que mostrar."""
+    if not isinstance(detalle, dict):
+        return ""
+    filas = []
+    for clave, etiqueta in CAMPOS_DETALLE:
+        valor = detalle.get(clave)
+        if valor and isinstance(valor, str):
+            filas.append(f"<dt>{html.escape(etiqueta)}</dt><dd>{html.escape(valor)}</dd>")
+    if not filas:
+        return ""
+    return f"""
+          <details class="op__pliego">
+            <summary>Detalle del pliego</summary>
+            <dl>{"".join(filas)}</dl>
+          </details>"""
+
 
 def tarjeta_html(item):
     dias = dias_restantes(item.get("plazo"))
@@ -75,6 +102,7 @@ def tarjeta_html(item):
     sem_etiqueta = SEMAFORO_ETIQUETA.get(semaforo, SEMAFORO_ETIQUETA["naranja"])
     motivos = item.get("motivos") or []
     sem_tooltip = " · ".join(motivos)
+    detalle_html = bloque_detalle_pliego(item.get("detalle_pliego"))
     return f"""
       <article class="op" data-isla="{html.escape(isla)}" data-dias="{dias if dias is not None else 99999}" data-importe="{imp}" data-semaforo="{html.escape(semaforo)}" data-relevante="{str(bool(item.get('relevante', True))).lower()}" data-texto="{html.escape((titulo + ' ' + organo + ' ' + resumen).lower())}">
         <div class="op__clock op__clock--{clase}">
@@ -87,6 +115,7 @@ def tarjeta_html(item):
           <p class="op__org">{html.escape(organo)}{(" · " + html.escape(isla)) if isla else ""}</p>
           <p class="op__summary">{html.escape(resumen)}</p>
           {f'<p class="op__motivos">{html.escape(sem_tooltip)}</p>' if sem_tooltip else ""}
+          {detalle_html}
           <div class="op__meta">
             <span class="op__amount">{html.escape(formatear_importe(item.get("importe")))}</span>
             <a class="op__link" href="{html.escape(item.get("enlace") or "#")}" target="_blank" rel="noopener">Ver pliego →</a>
@@ -147,6 +176,12 @@ CABECERA = r"""<!doctype html>
   .op__semaforo--naranja{background:#fbeed9;color:#95611a;}
   .op__semaforo--rojo{background:#fbe2dc;color:#a6402a;}
   .op__motivos{font-size:12.5px;color:var(--ink-soft);margin:-8px 0 14px;font-style:italic;}
+  .op__pliego{margin:0 0 16px;font-size:13px;}
+  .op__pliego summary{cursor:pointer;font-weight:600;color:var(--teal);}
+  .op__pliego dl{margin:10px 0 0;}
+  .op__pliego dt{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;
+    color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;margin:10px 0 2px;}
+  .op__pliego dd{margin:0 0 0 0;color:#28424d;}
   .op[data-relevante="false"]{opacity:.6;}
   .op[data-relevante="false"] .op__title{font-size:17px;}
   .op__title{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;

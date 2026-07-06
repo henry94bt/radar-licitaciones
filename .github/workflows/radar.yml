@@ -30,8 +30,7 @@ jobs:
 
       - name: Enviar email diario
         env:
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: python -m src.email_diario
 
       - name: Publicar resultado

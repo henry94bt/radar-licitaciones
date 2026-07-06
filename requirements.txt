@@ -2,6 +2,7 @@
 requests>=2.31          # descarga del fichero de la PLACSP
 lxml>=5.0               # parseo XML/ATOM/CODICE (más rápido y tolerante que etree)
 pandas>=2.0             # filtrado y manejo tabular
+pypdf>=4.0              # extraer texto de los PCAP/PPT (Fase 2)
 
 # Resúmenes con LLM
 anthropic>=0.40         # cliente oficial de la API de Anthropic
