@@ -18,7 +18,12 @@ ANIO_MES = date.today().strftime("%Y%m")
 URL = f"https://contrataciondelsectorpublico.gob.es/sindicacion/sindicacion_643/licitacionesPerfilesContratanteCompleto3_{ANIO_MES}.zip"
 MODELO = "claude-haiku-4-5-20251001"
 SALIDA_JSON = "data/relevantes.json"
+SALIDA_JSON_NACIONAL = "data/relevantes_nacional.json"
 MAX_CANDIDATAS = 150  # tope de seguridad, no limitacion real (antes 40, era para la demo)
+# El resto de Espana tiene MUCHO mas volumen que Canarias (miles de
+# licitaciones/mes vs decenas), asi que el tope aqui es mas bajo para no
+# disparar el coste de llamadas a la IA.
+MAX_CANDIDATAS_NACIONAL = 80
 
 KEYWORDS = [
     "publicidad", "comunicacion", "campana", "marketing", "difusion",
@@ -37,6 +42,18 @@ KEYWORDS = [
 # tenga ninguna KEYWORD (a veces el organo clasifica mal el titulo).
 CPV_RELEVANTES = [
     "7934", "79822500", "79823000", "92111", "72400000", "72413000", "79416",
+]
+
+# Fuera de Canarias no hay presencia fisica de La Pepa, asi que solo tiene
+# sentido mirar trabajo 100% ejecutable en remoto (diseno, web, branding,
+# contenido/RRSS). Deliberadamente MAS ESTRICTO que KEYWORDS: fuera quedan
+# "evento", "promocion", "difusion", "imagen"... que en Canarias cuelan pero
+# a nivel nacional casi siempre implican presencia fisica o son demasiado
+# ambiguos para el volumen de candidatas que generarian.
+KEYWORDS_REMOTO_NACIONAL = [
+    "diseno grafico", "diseno web", "pagina web", "sitio web", "desarrollo web",
+    "branding", "identidad corporativa", "redes sociales", "social media",
+    "estrategia de contenido", "audiovisual", "video corporativo",
 ]
 
 # Si el titulo contiene cualquiera de estos, se descarta ANTES de llamar a la
@@ -156,6 +173,17 @@ def es_candidata(row):
     return any(cpv.startswith(pref) for pref in CPV_RELEVANTES)
 
 
+def es_candidata_nacional(row):
+    """Filtro para el resto de Espana (ambito='nacional'): mismas
+    exclusiones que Canarias, pero solo entra por keyword estricta de
+    trabajo remoto. Sin comodin de CPV: a este volumen, el CPV amplio
+    (CPV_RELEVANTES) traeria demasiado ruido para revisar a mano."""
+    t = sin_tildes(row.get("titulo", ""))
+    if any(ex in t for ex in EXCLUSIONES):
+        return False
+    return any(k in t for k in KEYWORDS_REMOTO_NACIONAL)
+
+
 def evaluar(row):
     datos = (
         f"Titulo: {row['titulo']}\n"
@@ -193,20 +221,38 @@ def main():
     df = pd.concat(dfs, ignore_index=True)
     print(f"{len(df)} licitaciones en el mes.")
 
-    # Filtro 1: Canarias
-    df = df[df["nuts"].fillna("").str.startswith("ES70")]
-    # Filtro 2: tematica (keyword de titulo O cpv relevante, vetado por exclusiones)
-    df = df[df.apply(es_candidata, axis=1)]
-    # Filtro 3: en plazo (fecha de cierre futura). Las fechas ISO se comparan como texto.
+    es_canarias = df["nuts"].fillna("").str.startswith("ES70")
+
+    # Rama 1: Canarias (filtro amplio: keyword O cpv relevante).
+    df_can = df[es_canarias]
+    df_can = df_can[df_can.apply(es_candidata, axis=1)]
+    df_can = df_can.assign(ambito="canarias")
+
+    # Rama 2: resto de Espana (filtro estricto: solo keyword de trabajo remoto).
+    df_nac = df[~es_canarias]
+    df_nac = df_nac[df_nac.apply(es_candidata_nacional, axis=1)]
+    df_nac = df_nac.assign(ambito="nacional")
+
+    df = pd.concat([df_can, df_nac], ignore_index=True)
+
+    # Filtro comun: en plazo (fecha de cierre futura). Las fechas ISO se comparan como texto.
     hoy = date.today().isoformat()
     df = df[df["plazo"].fillna("") >= hoy]
     # Quitar duplicados (un expediente aparece varias veces al actualizarse)
     df = df.drop_duplicates(subset=["organo", "titulo"])
-    print(f"{len(df)} candidatas de Canarias, abiertas y del sector.")
+    print(f"{(df['ambito'] == 'canarias').sum()} candidatas de Canarias, "
+          f"{(df['ambito'] == 'nacional').sum()} candidatas del resto de Espana (remoto), abiertas y del sector.")
 
-    if len(df) > MAX_CANDIDATAS:
-        df = df.head(MAX_CANDIDATAS)
-        print(f"(tope de seguridad: limito a {MAX_CANDIDATAS})")
+    # Tope de seguridad por ambito, para que el nacional (mucho mas volumen)
+    # no se coma el presupuesto de llamadas a la IA.
+    partes = []
+    for ambito, tope in (("canarias", MAX_CANDIDATAS), ("nacional", MAX_CANDIDATAS_NACIONAL)):
+        parte = df[df["ambito"] == ambito]
+        if len(parte) > tope:
+            parte = parte.head(tope)
+            print(f"(tope de seguridad {ambito}: limito a {tope})")
+        partes.append(parte)
+    df = pd.concat(partes, ignore_index=True)
 
     print("Pasandolas por la IA...")
     items = []
@@ -237,6 +283,7 @@ def main():
             "semaforo": semaforo,
             "motivos": v.get("motivos", []),
             "detalle_pliego": detalle_pliego,
+            "ambito": row["ambito"],
         })
         icono = "⛔" if not v.get("relevante") else SEMAFORO_ICONO.get(semaforo, "⚪")
         extra = " 📄" if detalle_pliego else ""
@@ -246,12 +293,21 @@ def main():
     orden_semaforo = {"verde": 0, "naranja": 1, "rojo": 2}
     items.sort(key=lambda it: (orden_semaforo.get(it.get("semaforo"), 1), it.get("plazo") or ""))
 
-    recomendadas = sum(1 for it in items if it["relevante"])
-    print(f"{len(items)} analizadas. {recomendadas} recomendadas, {len(items) - recomendadas} descartadas (guardadas igualmente con motivo).")
+    items_canarias = [it for it in items if it["ambito"] == "canarias"]
+    items_nacional = [it for it in items if it["ambito"] == "nacional"]
+
     os.makedirs("data", exist_ok=True)
-    with open(SALIDA_JSON, "w", encoding="utf-8") as f:
-        json.dump(items, f, ensure_ascii=False, indent=2)
-    print(f"Guardado en {SALIDA_JSON}. Ahora ejecuta:  python dashboard.py")
+    for etiqueta, subset, ruta in (
+        ("Canarias", items_canarias, SALIDA_JSON),
+        ("Resto de Espana (remoto)", items_nacional, SALIDA_JSON_NACIONAL),
+    ):
+        recomendadas = sum(1 for it in subset if it["relevante"])
+        print(f"{etiqueta}: {len(subset)} analizadas. {recomendadas} recomendadas, "
+              f"{len(subset) - recomendadas} descartadas (guardadas igualmente con motivo).")
+        with open(ruta, "w", encoding="utf-8") as f:
+            json.dump(subset, f, ensure_ascii=False, indent=2)
+        print(f"Guardado en {ruta}.")
+    print("Ahora ejecuta:  python dashboard.py")
 
 
 if __name__ == "__main__":

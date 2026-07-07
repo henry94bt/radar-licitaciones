@@ -5,6 +5,8 @@ from datetime import date
 
 ENTRADA = "data/relevantes.json"
 SALIDA = "docs/index.html"
+ENTRADA_NACIONAL = "data/relevantes_nacional.json"
+SALIDA_NACIONAL = "docs/nacional.html"
 
 MESES = ["", "ene", "feb", "mar", "abr", "may", "jun",
          "jul", "ago", "sep", "oct", "nov", "dic"]
@@ -129,7 +131,7 @@ CABECERA = r"""<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Radar de Licitaciones · Canarias</title>
+<title>@@TITULO_PAGINA@@</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -143,6 +145,10 @@ CABECERA = r"""<!doctype html>
     font-family:"Inter",system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;}
   .wrap{max-width:880px;margin:0 auto;padding:48px 24px 80px;}
   header{border-bottom:2px solid var(--ink);padding-bottom:24px;}
+  .nav{margin:0 0 14px;}
+  .nav a{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;
+    color:var(--teal);text-decoration:none;letter-spacing:.02em;}
+  .nav a:hover,.nav a:focus-visible{text-decoration:underline;}
   .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;
     letter-spacing:.22em;text-transform:uppercase;color:var(--teal);margin:0 0 12px;}
   h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;
@@ -206,14 +212,15 @@ CABECERA = r"""<!doctype html>
 <body>
 <div class="wrap">
   <header>
+    <p class="nav">@@NAV@@</p>
     <p class="eyebrow">Radar de Licitaciones</p>
-    <h1>Lo que se cuece en lo público.</h1>
-    <p class="sub">Concursos de comunicación, diseño y eventos en Canarias, filtrados y resumidos para no leerse un solo pliego.</p>
+    <h1>@@TITULO_H1@@</h1>
+    <p class="sub">@@SUBTITULO@@</p>
   </header>
   <div class="controls">
     <input id="q" type="search" placeholder="Buscar: redes sociales, diseño, vídeo...">
     <select id="isla">
-      <option value="">Todas las islas</option>
+      <option value="">@@FILTRO_LUGAR@@</option>
     </select>
     <select id="semaforo">
       <option value="">Oportunidades (verde/naranja)</option>
@@ -283,7 +290,7 @@ CABECERA = r"""<!doctype html>
 </html>"""
 
 
-def generar_html(items):
+def generar_html(items, salida, titulo_pagina, titulo_h1, subtitulo, nav_html, filtro_lugar):
     if items:
         tarjetas = "\n".join(tarjeta_html(it) for it in items)
     else:
@@ -296,21 +303,52 @@ def generar_html(items):
            .replace("@@TOTAL@@", str(total))
            .replace("@@RECOMENDADAS@@", str(recomendadas))
            .replace("@@FECHA@@", fecha_txt)
-           .replace("@@TARJETAS@@", tarjetas))
+           .replace("@@TARJETAS@@", tarjetas)
+           .replace("@@TITULO_PAGINA@@", titulo_pagina)
+           .replace("@@TITULO_H1@@", titulo_h1)
+           .replace("@@SUBTITULO@@", subtitulo)
+           .replace("@@NAV@@", nav_html)
+           .replace("@@FILTRO_LUGAR@@", filtro_lugar))
     os.makedirs("docs", exist_ok=True)
-    with open(SALIDA, "w", encoding="utf-8") as f:
+    with open(salida, "w", encoding="utf-8") as f:
         f.write(doc)
-    print(f"Dashboard generado en {SALIDA}")
+    print(f"Dashboard generado en {salida}")
+
+
+def _cargar(ruta):
+    try:
+        with open(ruta, encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return None
 
 
 def main():
-    try:
-        with open(ENTRADA, encoding="utf-8") as f:
-            items = json.load(f)
-    except FileNotFoundError:
-        print(f"No encuentro {ENTRADA}. Ejecuta primero:  python actualizar.py")
+    items_canarias = _cargar(ENTRADA)
+    items_nacional = _cargar(ENTRADA_NACIONAL)
+
+    if items_canarias is None and items_nacional is None:
+        print(f"No encuentro {ENTRADA} ni {ENTRADA_NACIONAL}. Ejecuta primero:  python actualizar.py")
         return
-    generar_html(items)
+
+    if items_canarias is not None:
+        generar_html(
+            items_canarias, SALIDA,
+            titulo_pagina="Radar de Licitaciones · Canarias",
+            titulo_h1="Lo que se cuece en lo público.",
+            subtitulo="Concursos de comunicación, diseño y eventos en Canarias, filtrados y resumidos para no leerse un solo pliego.",
+            nav_html='<a href="nacional.html">Ver oportunidades de toda España (remoto) →</a>',
+            filtro_lugar="Todas las islas",
+        )
+    if items_nacional is not None:
+        generar_html(
+            items_nacional, SALIDA_NACIONAL,
+            titulo_pagina="Radar de Licitaciones · Resto de España",
+            titulo_h1="Lo que se cuece, en remoto.",
+            subtitulo="Concursos de diseño, web, branding y comunicación en toda España ejecutables 100% en remoto.",
+            nav_html='<a href="index.html">← Ver oportunidades de Canarias</a>',
+            filtro_lugar="Todas las provincias",
+        )
 
 
 if __name__ == "__main__":
