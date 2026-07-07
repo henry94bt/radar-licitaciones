@@ -29,6 +29,7 @@ jobs:
           python dashboard.py
 
       - name: Enviar email diario
+        continue-on-error: true  # mientras Resend no este configurado, que no bloquee la publicacion del dashboard
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: python -m src.email_diario
