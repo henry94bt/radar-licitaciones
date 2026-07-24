@@ -3,6 +3,11 @@ data/
 *.zip
 *.atom
 
+# pliegos/<id_evl>/: anexos originales de cada expediente para seguimiento
+# manual. Los PDF pesan y son descargables de nuevo desde PLACSP -> no van a
+# git. Los .md (notas, resumenes) si van, son los que aportan valor versionado.
+pliegos/**/*.pdf
+
 # Python
 __pycache__/
 *.pyc
