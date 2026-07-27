@@ -23,3 +23,13 @@ falsos rojos que eran ganables) y afinarlo con datos en vez de intuición.
 No se rellena nada de esto automáticamente todavía — es la base para que,
 según se vayan cerrando expedientes, alguien (Henry, o un paso futuro del
 pipeline) añada la fila correspondiente a mano o semi-automatizado.
+
+## Cómo registrar un desenlace
+
+En vez de editar `data/historico.csv` a mano, usar `src/historico.py` — crea la
+fila si no existe, o actualiza solo los campos indicados si ya existe. Valida
+que `resultado` sea uno de los 5 valores permitidos.
+
+```bash
+python -m src.historico BzszOPWAEUpLAIVZdUs8KA== resultado=ganada adjudicatario="La Pepa Studio" importe_adjudicacion=59000
+```
