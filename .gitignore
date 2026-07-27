@@ -20,3 +20,12 @@ venv/
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Archivos de prueba/scratch (temporales de sesiones de Claude Code)
+scratch_*
+test_detalle_*.py
+
+licitaciones/**/pdf/
+
+# Artefacto generado por graphify (grafo de conocimiento local para Claude Code)
+graphify-out/
