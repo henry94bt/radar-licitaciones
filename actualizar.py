@@ -184,6 +184,64 @@ def es_candidata_nacional(row):
     return any(k in t for k in KEYWORDS_REMOTO_NACIONAL)
 
 
+ISLAS_FUERA_GC = ["tenerife", "lanzarote", "fuerteventura", "la palma", "la gomera", "el hierro"]
+
+# Subconjunto de KEYWORDS que indica trabajo ejecutable en remoto (sin
+# presencia fisica). Se usa solo en el fallback sin IA, para no marcar como
+# rojo automatico un evento fuera de Gran Canaria si en realidad es diseno/
+# web/RRSS puro.
+KEYWORDS_REMOTO = [
+    "diseno", "diseno grafico", "diseno web", "web", "branding", "marca",
+    "identidad corporativa", "redes sociales", "social media", "audiovisual",
+    "video", "contenido", "seo",
+]
+
+
+def clasificar_sin_ia(row):
+    """Clasificacion de respaldo cuando falla la llamada a la IA (credito
+    agotado, rate limit, error transitorio de la API...). No usa Claude:
+    aplica las mismas senales de encaje ya usadas en el filtro de entrada,
+    de forma puramente mecanica.
+
+    A proposito el techo es 'naranja': nunca se asigna 'verde' sin que la IA
+    lo confirme (misma logica de "ante la duda, naranja, nunca verde" que se
+    usa a mano). El motivo y el resumen dejan explicito que es una
+    clasificacion provisional, para que nunca se confunda con el criterio
+    real de la IA.
+    """
+    t = sin_tildes(row.get("titulo", ""))
+    lugar_original = limpio(row.get("lugar"))
+    lugar = sin_tildes(lugar_original or "")
+    ambito = row.get("ambito")
+    es_remoto = any(k in t for k in KEYWORDS_REMOTO)
+
+    if ambito == "nacional":
+        # Para llegar aqui ya paso el filtro estricto de trabajo remoto
+        # (KEYWORDS_REMOTO_NACIONAL), asi que el riesgo de presencia fisica
+        # es bajo de por si.
+        semaforo = "naranja"
+        motivos = ["Clasificacion provisional (sin IA): coincide con keyword de trabajo remoto. Revisar a mano."]
+    else:
+        fuera_gc = any(isla in lugar for isla in ISLAS_FUERA_GC)
+        if fuera_gc and not es_remoto:
+            semaforo = "rojo"
+            motivos = [f"Clasificacion provisional (sin IA): ejecucion presencial fuera de Gran Canaria ({lugar_original}). Revisar a mano."]
+        else:
+            semaforo = "naranja"
+            motivos = ["Clasificacion provisional (sin IA): coincide con el filtro de entrada (keyword/CPV). Revisar a mano."]
+
+    return {
+        "relevante": semaforo != "rojo",
+        "semaforo": semaforo,
+        "motivos": motivos,
+        "resumen": (
+            f"{row['titulo']}. Sin resumen de IA: fallo la clasificacion automatica "
+            "(credito agotado o error de la API). Revisar el pliego a mano."
+        ),
+        "sin_ia": True,
+    }
+
+
 def evaluar(row):
     datos = (
         f"Titulo: {row['titulo']}\n"
@@ -256,17 +314,27 @@ def main():
 
     print("Pasandolas por la IA...")
     items = []
+    fallos_ia_seguidos = 0
     for _, row in df.iterrows():
+        sin_ia = False
         try:
             v = evaluar(row)
+            fallos_ia_seguidos = 0
         except Exception as e:
-            print(f"(salto una por un error: {e})")
-            continue
+            print(f"  (fallo la IA, clasifico con reglas locales: {e})")
+            v = clasificar_sin_ia(row)
+            sin_ia = True
+            fallos_ia_seguidos += 1
+            if fallos_ia_seguidos == 5:
+                print("  ⚠️  5 fallos de IA seguidos — probable credito agotado o API caida. "
+                      "Sigo con clasificacion sin IA para el resto del lote (no se pierde nada, "
+                      "pero revisa la cuenta de Anthropic).")
+
         titulo_corto = row["titulo"][:70]
         semaforo = v.get("semaforo") or ("verde" if v.get("relevante") else "rojo")
 
         detalle_pliego = None
-        if semaforo in ("verde", "naranja"):
+        if not sin_ia and semaforo in ("verde", "naranja"):
             texto_pliego = obtener_texto_pliego(row)
             if texto_pliego:
                 try:
@@ -284,10 +352,16 @@ def main():
             "motivos": v.get("motivos", []),
             "detalle_pliego": detalle_pliego,
             "ambito": row["ambito"],
+            "sin_ia": sin_ia,
         })
-        icono = "⛔" if not v.get("relevante") else SEMAFORO_ICONO.get(semaforo, "⚪")
+        icono = "🤖" if sin_ia else ("⛔" if not v.get("relevante") else SEMAFORO_ICONO.get(semaforo, "⚪"))
         extra = " 📄" if detalle_pliego else ""
         print(f"  {icono} {titulo_corto}{extra}")
+
+    total_sin_ia = sum(1 for it in items if it.get("sin_ia"))
+    if total_sin_ia:
+        print(f"\n⚠️  {total_sin_ia} candidata(s) de esta ejecucion se clasificaron sin IA "
+              "(revisa el credito/estado de la API de Anthropic).")
 
     # Orden: primero verdes, luego naranjas, luego rojas; dentro de cada grupo por plazo.
     orden_semaforo = {"verde": 0, "naranja": 1, "rojo": 2}

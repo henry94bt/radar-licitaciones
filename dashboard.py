@@ -102,9 +102,15 @@ def tarjeta_html(item):
         imp = 0
     semaforo = item.get("semaforo") or "naranja"
     sem_etiqueta = SEMAFORO_ETIQUETA.get(semaforo, SEMAFORO_ETIQUETA["naranja"])
+    sin_ia = bool(item.get("sin_ia"))
     motivos = item.get("motivos") or []
     sem_tooltip = " · ".join(motivos)
     detalle_html = bloque_detalle_pliego(item.get("detalle_pliego"))
+    badge_sin_ia = (
+        ' <span class="op__sinia" title="Fallo la llamada a la IA (credito agotado o error de API); '
+        'clasificacion provisional por reglas locales, sin lectura del pliego">🤖 Sin IA</span>'
+        if sin_ia else ""
+    )
     return f"""
       <article class="op" data-isla="{html.escape(isla)}" data-dias="{dias if dias is not None else 99999}" data-importe="{imp}" data-semaforo="{html.escape(semaforo)}" data-relevante="{str(bool(item.get('relevante', True))).lower()}" data-texto="{html.escape((titulo + ' ' + organo + ' ' + resumen).lower())}">
         <div class="op__clock op__clock--{clase}">
@@ -112,7 +118,7 @@ def tarjeta_html(item):
           <span class="op__deadline">{html.escape(formatear_fecha(item.get("plazo")))}</span>
         </div>
         <div class="op__body">
-          <div class="op__semaforo op__semaforo--{html.escape(semaforo)}" title="{html.escape(sem_tooltip)}">{html.escape(sem_etiqueta)}</div>
+          <div class="op__semaforo op__semaforo--{html.escape(semaforo)}" title="{html.escape(sem_tooltip)}">{html.escape(sem_etiqueta)}</div>{badge_sin_ia}
           <h2 class="op__title">{html.escape(titulo)}</h2>
           <p class="op__org">{html.escape(organo)}{(" · " + html.escape(isla)) if isla else ""}</p>
           <p class="op__summary">{html.escape(resumen)}</p>
@@ -181,6 +187,9 @@ CABECERA = r"""<!doctype html>
   .op__semaforo--verde{background:#e3f3ec;color:#1f6b50;}
   .op__semaforo--naranja{background:#fbeed9;color:#95611a;}
   .op__semaforo--rojo{background:#fbe2dc;color:#a6402a;}
+  .op__sinia{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:11px;
+    font-weight:600;letter-spacing:.04em;padding:3px 9px;border-radius:20px;margin:0 0 10px;
+    background:#eef1f2;color:#54676f;border:1px dashed #9aa7ac;cursor:default;}
   .op__motivos{font-size:12.5px;color:var(--ink-soft);margin:-8px 0 14px;font-style:italic;}
   .op__pliego{margin:0 0 16px;font-size:13px;}
   .op__pliego summary{cursor:pointer;font-weight:600;color:var(--teal);}
@@ -234,7 +243,7 @@ CABECERA = r"""<!doctype html>
       <option value="importe">Mayor importe</option>
     </select>
   </div>
-  <p class="count"><strong id="visibles">@@RECOMENDADAS@@</strong> de @@TOTAL@@ analizadas · @@RECOMENDADAS@@ oportunidades · Actualizado @@FECHA@@</p>
+  <p class="count"><strong id="visibles">@@RECOMENDADAS@@</strong> de @@TOTAL@@ analizadas · @@RECOMENDADAS@@ oportunidades · Actualizado @@FECHA@@@@AVISO_SIN_IA@@</p>
   <main class="ops" id="ops">
 @@TARJETAS@@
   </main>
@@ -299,9 +308,15 @@ def generar_html(items, salida, titulo_pagina, titulo_h1, subtitulo, nav_html, f
     fecha_txt = f"{hoy.day} {MESES[hoy.month]} {hoy.year}"
     total = len(items)
     recomendadas = sum(1 for it in items if it.get("relevante", True))
+    sin_ia = sum(1 for it in items if it.get("sin_ia"))
+    aviso_sin_ia = (
+        f' · ⚠️ {sin_ia} sin evaluar por IA (revisar credito de la API)'
+        if sin_ia else ""
+    )
     doc = (CABECERA
            .replace("@@TOTAL@@", str(total))
            .replace("@@RECOMENDADAS@@", str(recomendadas))
+           .replace("@@AVISO_SIN_IA@@", aviso_sin_ia)
            .replace("@@FECHA@@", fecha_txt)
            .replace("@@TARJETAS@@", tarjetas)
            .replace("@@TITULO_PAGINA@@", titulo_pagina)
